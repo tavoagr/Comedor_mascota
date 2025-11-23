@@ -1,0 +1,45 @@
+#include <ESP32Servo.h>
+
+// Pines
+const int PIR_PIN = 2; 
+const int LED_PIN = 5;
+const int SERVO_PIN = 13;
+
+// Ángulos del servo
+const int ANGULO_ABIERTO = 90;
+const int ANGULO_CERRADO = 0;
+
+Servo miServo;
+bool estadoAnterior = LOW;
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  miServo.attach(SERVO_PIN);
+  miServo.write(ANGULO_CERRADO);
+
+  Serial.println("Sistema inicializado. Esperando movimiento...");
+}
+
+void loop() {
+
+  int movimiento = digitalRead(PIR_PIN);
+
+  if (movimiento != estadoAnterior) {
+    if (movimiento == HIGH) {
+      digitalWrite(LED_PIN, HIGH);
+      miServo.write(ANGULO_ABIERTO);
+      Serial.println("¡Movimiento detectado! LED ON y Servo abierto.");
+    } else {
+      digitalWrite(LED_PIN, LOW);
+      miServo.write(ANGULO_CERRADO);
+      Serial.println("Sin movimiento. LED OFF y Servo cerrado.");
+    }
+    estadoAnterior = movimiento;
+  }
+
+  delay(100); // evita lecturas muy rápidas
+}
